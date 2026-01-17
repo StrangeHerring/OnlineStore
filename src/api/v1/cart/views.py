@@ -1,4 +1,5 @@
-from fastapi import status, APIRouter, Depends
+from fastapi import status, APIRouter, Depends, Cookie
+from typing import Optional
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 from fastapi.security.http import HTTPAuthorizationCredentials
@@ -18,9 +19,19 @@ auth_scheme = HTTPBearer(scheme_name="Bearer")
 async def create_cart(
     payload: CartCreate,
     token: HTTPAuthorizationCredentials = Depends(auth_scheme),
-    usecase: AbstractCreateCartUseCase = Depends(create_cart_use_case)
+    usecase: AbstractCreateCartUseCase = Depends(create_cart_use_case),
+    cart_cookie: Optional[str] = Cookie(default=None, alias='cart'),
 ) -> JSONResponse:
-    cart = await usecase.execute(payload, token)
+    cart = await usecase.execute(payload, token, cart_cookie)
+    # if user.is_guest():
+    #     JSONResponse.set_cookie(
+    #         key='cart',
+    #         value=cart.model_dump(),
+    #         max_age=30 * 24 * 3600,
+    #         httponly=True,
+    #         samesite="lax"
+    #     )
+    #     return JSONResponse(status_code=status.HTTP_201_CREATED)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=cart.model_dump())
 
 @router.get("/{cart_id}", response_model=CartBase)
@@ -28,12 +39,21 @@ async def get_cart(
     cart_id: int,
     token: HTTPAuthorizationCredentials = Depends(auth_scheme),
     repo: PostgreSQLCartRepository = Depends(),
+    cart_cookie: Optional[str] = Cookie(default=None, alias='cart'),
 ) -> JSONResponse:
-    content = repo.get_cart(token, cart_id)
+    content = repo.get_cart(token, cart_id, cart_cookie)
+    # if user.is_guest():
+    #     JSONResponse.set_cookie(
+    #         key='cart',
+    #         value=content.model_dump(),
+    #         max_age=30 * 24 * 3600,
+    #         httponly=True,
+    #         samesite="lax"
+    #     )
     return JSONResponse(status_code=status.HTTP_200_OK, content=content.model_dump())
 
 @router.get("/", response_model=list[CartBase])
-async def list_Carts(
+async def list_сarts(
     limit: int = 10,
     offset: int = 0,
     token: HTTPAuthorizationCredentials = Depends(auth_scheme),
@@ -48,8 +68,17 @@ async def update_cart(
     payload: CartUpdate,
     token: HTTPAuthorizationCredentials = Depends(auth_scheme),
     repo: PostgreSQLCartRepository = Depends(),
+    cart_cookie: Optional[str] = Cookie(default=None, alias='cart'),
 ) -> JSONResponse:
-    repo.update_cart(token, cart_id, payload)
+    repo.update_cart(token, cart_id, payload, cart_cookie)  
+    # if user.is_guest():
+    #     JSONResponse.set_cookie(
+    #         key='cart',
+    #         value=content.model_dump(),
+    #         max_age=30 * 24 * 3600,
+    #         httponly=True,
+    #         samesite="lax"
+    #     )
     return JSONResponse(status_code=status.HTTP_200_OK)
 
 @router.delete("/{cart_id}", status_code=status.HTTP_204_NO_CONTENT)

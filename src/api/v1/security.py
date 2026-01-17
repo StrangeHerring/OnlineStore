@@ -1,16 +1,17 @@
 from fastapi.security.http import HTTPAuthorizationCredentials
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
-from app.core.config import settings
+from api.v1.config import settings
 from jose import JWTError, jwt
-from app.schemas.auth import TokenResponse
+from api.v1.auth.models import TokenResponse
 from fastapi.encoders import jsonable_encoder
 from fastapi import HTTPException, Depends, status
-from app.models.models import User
-from sqlalchemy.orm import Session
+from infrastructure.databases.postgresql.models import User
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from fastapi.security import HTTPBearer
-from app.db.database import get_db
-from app.utils.responses import ResponseHandler
+from infrastructure.databases.postgresql.session import get_async_session
+from infrastructure.utils.responses import ResponseHandler
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -74,11 +75,13 @@ def get_current_user(token):
     return user.get('id')
 
 
-def check_admin_role(
+async def check_admin_role(
         token: HTTPAuthorizationCredentials = Depends(auth_scheme),
-        db: Session = Depends(get_db)):
+        session: AsyncSession = Depends(get_async_session),) -> None:
     user = get_token_payload(token.credentials)
     user_id = user.get('id')
-    role_user = db.query(User).filter(User.id == user_id).first()
+    query = select(User).where(User.id == user_id)
+    result = await session.execute(query)
+    role_user = result.scalar_one_or_none()
     if role_user.role != "admin":
         raise HTTPException(status_code=403, detail="Admin role required")

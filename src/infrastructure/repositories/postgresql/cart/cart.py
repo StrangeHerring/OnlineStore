@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import Asyncsession
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
+from typing import Optional
 
 
 from infrastructure.databases.postgresql.models.cart import Cart
@@ -15,8 +16,12 @@ class PostgreSQLCartRepository:
     def __init__(self, session: Asyncsession):
         self._session = session
     
-    async def get_cart(self, token, cart_id: int) -> CartBase:
+    async def get_cart(self, token, cart_id: int, cart_cookie: Optional[str]) -> CartBase:
         user_id = get_current_user(token)
+
+        # if user.is_guest():
+        #     return cart_cookie
+
         query = select(Cart).where(Cart.id == cart_id, Cart.user_id == user_id)
         result = await self._session.execute(query)
         cart = result.scalar_one_or_none()
@@ -33,7 +38,7 @@ class PostgreSQLCartRepository:
         carts = result.scalars().all()
         return carts
     
-    async def create_cart(self, token, payload: CartCreate) -> CartBase:
+    async def create_cart(self, token, payload: CartCreate, cart_cookie: Optional[str]) -> CartBase:
         user_id = get_current_user(token)
         cart = payload.model_dump()
 
@@ -57,6 +62,12 @@ class PostgreSQLCartRepository:
 
             cart_items.append(cart_item)
         
+        # if user.is_guest:
+        #     schema = CartCreate(
+        #         cart_items=cart_items
+        #     )
+        #     return schema
+
         self._session.add(Cart(user_id=user_id, total_amount=total_amount, cart_items=cart_items, **cart))
         await self._session.flush()
 
@@ -65,8 +76,16 @@ class PostgreSQLCartRepository:
         )
         return schema
 
-    async def update_cart(self, token, cart_id: int, payload: CartUpdate) -> None:
+    async def update_cart(self, token, cart_id: int, payload: CartUpdate, cart_cookie: Optional[str]) -> None:
         user_id = get_current_user(token)
+
+        # if user.is_guest():
+        #     if cart_cookie is None:
+        #         raise CartNotFound()
+        #     cart = CartBase(**json.loads(cart_cookie))
+        #     merge_carts(cart, payload.model_dump())
+        #     return json.dumps(cart.model_dump())
+
         query = select(Cart).where(Cart.id == cart_id, Cart.user_id == user_id)
         result = await self._session.execute(query)
         cart = result.scalar_one_or_none()
