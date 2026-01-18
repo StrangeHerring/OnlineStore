@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import List
-from app.schemas.carts import CartBase
+from api.v1.cart.models.carts import CartBase
 
 
 class AccountBase(BaseModel):

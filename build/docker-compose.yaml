@@ -17,23 +17,23 @@ services:
       timeout: 3s
       retries: 3
 
-  app:
-    build:
-      context: ..
-      dockerfile: build/Dockerfile
-    container_name: online_store_app
-    ports:
-      - "8080:8080"
-    networks:
-      - store_net
-    depends_on:
-      db:
-        condition: service_healthy
+  # app:
+  #   build:
+  #     context: ..
+  #     dockerfile: build/Dockerfile
+  #   container_name: online_store_app
+  #   ports:
+  #     - "8080:8080"
+  #   networks:
+  #     - store_net
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
 
 
 volumes:
   db_data:
 
 networks:
-  course_net:
+  store_net:
     driver: bridge

@@ -1,7 +1,8 @@
 from pydantic import BaseModel, Field
 from typing import List
 from datetime import datetime
-from app.schemas.products import ProductBase, CategoryBase
+from api.v1.product.models import ProductBase
+from api.v1.category.models import CategoryBase
 
 
 # Base Config

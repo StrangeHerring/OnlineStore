@@ -7,7 +7,7 @@ from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..base import Base
-from .cart import Cart
+# from .cart import Cart
 
 
 class User(Base):

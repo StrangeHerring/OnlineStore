@@ -14,7 +14,7 @@ __all__ = ("BASE_DIR", "DATETIME_FORMAT", "settings")
 class _AppSettings(BaseSettings):
     name: str = "OnlineStore"
     host: str = '0.0.0.0'
-    port: int = 8000
+    port: int = 8080
     secret_key: SecretStr
     debug: bool = True
 

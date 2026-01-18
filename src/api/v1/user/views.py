@@ -2,7 +2,7 @@ from fastapi import status, APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 
-from infrastructure.repositories.postgresql.user import PostgreSQLUserRepository
+from infrastructure.repositories.postgresql.user.user import PostgreSQLUserRepository
 from infrastructure.repositories.postgresql.user.exceptions import UserIsExist
 from usecase.create_user.abstract import AbstractCreateUserUseCase
 

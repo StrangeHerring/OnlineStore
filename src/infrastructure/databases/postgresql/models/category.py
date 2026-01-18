@@ -7,7 +7,7 @@ from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..base import Base
-from .product import Product
+# from .product import Product
 
 class Category(Base):
     __tablename__ = "categories"

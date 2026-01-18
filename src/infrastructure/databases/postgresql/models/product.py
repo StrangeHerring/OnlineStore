@@ -7,8 +7,8 @@ from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..base import Base
-from .category import Category
-from .cart_item import CartItem
+# from .category import Category
+# from .cart_item import CartItem
 
 class Product(Base):
     __tablename__ = "products"
@@ -22,7 +22,7 @@ class Product(Base):
     stock: Mapped[int] = mapped_column(nullable=False)
     brand: Mapped[str] = mapped_column(nullable=False)
     thumbnail: Mapped[str] = mapped_column(nullable=False)
-    images: Mapped[list[str]] = mapped_column(nullable=False)
+    images: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False)
     is_published: Mapped[bool] = mapped_column(server_default="True", nullable=False)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), server_default=text("NOW()"), nullable=False)
 

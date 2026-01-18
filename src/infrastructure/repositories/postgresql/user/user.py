@@ -4,10 +4,10 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.v1.user.models import UserBase, UserCreate, UserUpdate
+from api.v1.user.models import UserBase, UserCreate, UserUpdate
 from infrastructure.databases.postgresql.models.user import User
-from src.api.v1.user.exceptions import UserIsExist, UserNotFound
-from src.api.v1.security import get_password_hash
+from infrastructure.repositories.postgresql.user.exceptions import UserIsExist, UserNotFound
+from api.v1.security import get_password_hash
 
 
 class PostgreSQLUserRepository:
